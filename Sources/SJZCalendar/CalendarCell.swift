@@ -11,6 +11,16 @@ import SnapKit
 
 class CalendarCell: UICollectionViewCell {
     
+    var select: Bool = false {
+        didSet {
+            if select {
+                contentView.backgroundColor = .green
+            }else {
+                contentView.backgroundColor = .white
+            }
+        }
+    }
+    
     // 阳历Label
     private lazy var solarLabel: UILabel = {
         let dateLabel = UILabel()
@@ -56,34 +66,43 @@ class CalendarCell: UICollectionViewCell {
     
     func configureCell(model: CalendarModel, configure: CalendarConfigure) {
         guard model.year != 0, model.month != 0, model.day != 0 else {
-            solarLabel.text = ""
-            lunarLabel.text = ""
+            solarLabel.isHidden = true
+            lunarLabel.isHidden = true
             return
         }
+        
+        if configure.onlyShowShowMonth, model.monthType != .showMonth {
+            solarLabel.isHidden = true
+            lunarLabel.isHidden = true
+            return
+        }
+        
+        solarLabel.isHidden = false
+        lunarLabel.isHidden = false
         
         solarLabel.text = "\(model.day)"
         lunarLabel.text = model.lunarDay
         
-        if model.monthType == .currentMonth {
-            solarLabel.textColor = configure.currentColor
-            solarLabel.font = configure.currentFont
+        if model.monthType == .showMonth {
+            solarLabel.textColor = configure.showMonthColor
+            solarLabel.font = configure.showMonthFont
             
-            lunarLabel.textColor = configure.currentLunarColor
-            lunarLabel.font = configure.currentLunarFont
+            lunarLabel.textColor = configure.showMonthLunarColor
+            lunarLabel.font = configure.showMonthLunarFont
         }else {
-            solarLabel.textColor = configure.notCurrentColor
-            solarLabel.font = configure.notCurrentFont
+            solarLabel.textColor = configure.notShowMonthColor
+            solarLabel.font = configure.notShowMonthFont
             
-            lunarLabel.textColor = configure.notCurrentLunarColor
-            lunarLabel.font = configure.notCurrentLunarFont
+            lunarLabel.textColor = configure.notShowMonthLunarColor
+            lunarLabel.font = configure.notShowMonthLunarFont
         }
         
-        if model.isCurrentDay {
-            solarLabel.textColor = configure.selectColor
-            solarLabel.font = configure.selectFont
+        if model.isToday {
+            solarLabel.textColor = configure.TodayColor
+            solarLabel.font = configure.TodayFont
             
-            lunarLabel.textColor = configure.selectLunarColor
-            lunarLabel.font = configure.selectLunarFont
+            lunarLabel.textColor = configure.TodayLunarColor
+            lunarLabel.font = configure.TodayLunarFont
         }
         
         if configure.calendarType == .onlySolar {

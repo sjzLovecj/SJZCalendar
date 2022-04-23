@@ -8,9 +8,9 @@
 import Foundation
 
 enum CalendarDateType: Int {
-    case previousMonth
-    case currentMonth
-    case nextMonth
+    case previousMonth  // 上个月
+    case showMonth      // 展示月
+    case nextMonth      // 下个月
 }
 
 struct CalendarModel {
@@ -19,9 +19,9 @@ struct CalendarModel {
     var day: Int
     
     // 是否为当前月
-    var monthType: CalendarDateType = .currentMonth
+    var monthType: CalendarDateType = .showMonth
     // 是否为今天
-    var isCurrentDay = false
+    var isToday = false
     
     var date: Date?
     // 星期几

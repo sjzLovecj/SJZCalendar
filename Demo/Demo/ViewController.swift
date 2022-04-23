@@ -9,7 +9,6 @@ import UIKit
 
 class ViewController: UIViewController {
 
-    
     var calendar: CalendarView?
     
     override func viewDidLoad() {
@@ -23,13 +22,14 @@ class ViewController: UIViewController {
         let string = "2010-05-01"
         let startDate = form.date(from: string)
         
-        let endStr = "2050-05-01"
+        let endStr = "2100-05-01"
         let endDate = form.date(from: endStr)
         
         let configure = CalendarConfigure()
         configure.calendarType = .solarAndLunar
         configure.startDate = startDate!
         configure.endDate = endDate!
+//        configure.onlyShowShowMonth = true
         
         calendar = CalendarView(configure: configure)
         view.addSubview(calendar!)
@@ -40,5 +40,8 @@ class ViewController: UIViewController {
         })
     }
 
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        calendar?.previousMonth()
+    }
 }
 

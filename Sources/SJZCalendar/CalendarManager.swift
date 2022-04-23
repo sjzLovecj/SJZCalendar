@@ -172,7 +172,7 @@ struct CalendarManager {
         // 当前月
         for index in 1...dayCounts {
             var model = CalendarModel(year: year, month: month, day: index)
-            model.monthType = .currentMonth
+            model.monthType = .showMonth
 //            model.isCurrentDay = isCurrentDate(date: date)
             modelArr.append(model)
         }
@@ -240,7 +240,7 @@ struct CalendarManager {
     /// 判断给定日期是否为今天
     /// - Parameter date: 指定日期
     /// - Returns: 是否为今天
-    mutating func isCurrentDate(date: Date) -> Bool {
+    mutating func isToday(date: Date) -> Bool {
         let currentComPonents = components()
         let dateComPonents = components(date: date)
         
@@ -279,7 +279,7 @@ struct CalendarManager {
             model.date = date                           // 日期
             model.weekday = getWeekday(date: date) ?? 0 // 星期几
             
-            model.isCurrentDay = isCurrentDate(date: date)
+            model.isToday = isToday(date: date)
             
             let lunarStrArr = lunarFormatter.string(from: date).components(separatedBy: "年")
             if !lunarStrArr.isEmpty {

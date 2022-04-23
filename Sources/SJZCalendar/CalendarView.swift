@@ -13,6 +13,9 @@ class CalendarView: UIView, UICollectionViewDelegate {
     var configure: CalendarConfigure = CalendarConfigure()
     var dataSource: UICollectionViewDiffableDataSource<Int, Int>?
     
+    var selectIndexPath: IndexPath = IndexPath(row: 0, section: 0)
+    var showSection: Int = 0
+    
     private var monthModelArr: [[CalendarModel]] = []
     
     lazy var collectionView: UICollectionView = {
@@ -20,7 +23,6 @@ class CalendarView: UIView, UICollectionViewDelegate {
         // 隐藏滚动条
         collectionView.showsVerticalScrollIndicator = false
         collectionView.showsHorizontalScrollIndicator = false
-        
         collectionView.delegate = self
         collectionView.isPagingEnabled = true
 
@@ -102,12 +104,6 @@ class CalendarView: UIView, UICollectionViewDelegate {
         dataSource?.apply(snapshot, animatingDifferences: false)
     }
     
-    
-    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        collectionView.deselectItem(at: indexPath, animated: true)
-        
-    }
-    
     // 数据量太大，获取农历比较耗时，所以，将这一步放到即将展示的时候来做
     func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
         guard indexPath.section < self.monthModelArr.count,
@@ -119,9 +115,84 @@ class CalendarView: UIView, UICollectionViewDelegate {
         let modelArr = self.monthModelArr[indexPath.section]
         var model = modelArr[indexPath.item]
         self.configure.manager.configureModule(dateStr: "\(model.year)-\(model.month)-\(model.day)", model: &model)
-        
+
         if let cell =  cell as? CalendarCell {
             cell.configureCell(model: model, configure: self.configure)
+        
+            // 标记当前选中的indexPath,初始化时，默认为今天，这里只有当section 和 item都为0时，才赋值
+            if model.isToday, selectIndexPath.section == 0, selectIndexPath.item == 0 {
+                selectIndexPath = indexPath
+            }
+            
+            cell.select = false
+            if selectIndexPath == indexPath {
+                cell.select = true
+            }
+        }
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        collectionView.deselectItem(at: indexPath, animated: true)
+        guard let cell = collectionView.cellForItem(at: indexPath) as? CalendarCell,
+              indexPath.section < self.monthModelArr.count,
+              indexPath.item < self.monthModelArr[indexPath.section].count else {
+            return
+        }
+        
+        // 获取对应天数
+        let modelArr = self.monthModelArr[indexPath.section]
+        let model = modelArr[indexPath.item]
+        
+        if configure.onlyShowShowMonth, model.monthType != .showMonth {
+            return
+        }
+        
+        if let selectCell = collectionView.cellForItem(at: selectIndexPath) as? CalendarCell {
+            selectCell.select = false
+        }
+        
+        // 内置函数，当点击显示月中上个月或者下个月的日期时，需要自动滑动到需要显示的月
+        func changeShowMonth(section: Int) {
+            let changeArr = self.monthModelArr[section]
+            for (index, changeModel) in changeArr.enumerated() {
+                if changeModel.monthType != .showMonth {
+                    continue
+                }
+                if changeModel.year == model.year,
+                   changeModel.month == model.month,
+                   changeModel.day == model.day {
+                    selectIndexPath = IndexPath(row: index, section: section)
+                    break
+                }
+            }
+            collectionView.scrollToItem(at: IndexPath(row: 0, section: section), at: .top, animated: true)
+        }
+        
+        if model.monthType == .showMonth {
+            cell.select = true
+            selectIndexPath = indexPath
+        }else if model.monthType == .previousMonth, indexPath.section - 1 > 0 {
+            changeShowMonth(section: indexPath.section - 1)
+        }else if model.monthType == .nextMonth, indexPath.section + 1 < monthModelArr.count {
+            changeShowMonth(section: indexPath.section + 1)
+        }
+    }
+    
+    // 下个月
+    func nextMonth() {
+        let showX = collectionView.contentOffset.x
+        let showSection: Int = Int(showX / collectionView.frame.size.width)
+        if showSection + 1 < monthModelArr.count {
+            collectionView.scrollToItem(at: IndexPath(row: 0, section: showSection + 1), at: .top, animated: true)
+        }
+    }
+    
+    // 上个月
+    func previousMonth() {
+        let showX = collectionView.contentOffset.x
+        let showSection: Int = Int(showX / collectionView.frame.size.width)
+        if showSection - 1 > 0 {
+            collectionView.scrollToItem(at: IndexPath(row: 0, section: showSection - 1), at: .top, animated: true)
         }
     }
 }
