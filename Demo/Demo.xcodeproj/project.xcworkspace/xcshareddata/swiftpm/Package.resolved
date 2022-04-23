@@ -1,0 +1,25 @@
+{
+  "object": {
+    "pins": [
+      {
+        "package": "SJZBaseModule",
+        "repositoryURL": "git@github.com:sjzLovecj/SJZBaseModule.git",
+        "state": {
+          "branch": null,
+          "revision": "1c2b80ed2af6e6c78b4e9541d8c86c65a99ecce8",
+          "version": "0.0.1"
+        }
+      },
+      {
+        "package": "SnapKit",
+        "repositoryURL": "git@github.com:SnapKit/SnapKit.git",
+        "state": {
+          "branch": null,
+          "revision": "f222cbdf325885926566172f6f5f06af95473158",
+          "version": "5.6.0"
+        }
+      }
+    ]
+  },
+  "version": 1
+}
