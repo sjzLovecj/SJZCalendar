@@ -20,6 +20,7 @@ struct CalendarManager {
     lazy var currentCalendar: Calendar = {
         var current = Calendar.current
         current.timeZone = TimeZone(abbreviation: "UTC") ?? TimeZone.current
+        current.firstWeekday = 2
         return current
     }()
     
@@ -35,6 +36,7 @@ struct CalendarManager {
     
     // 当前月的下标
     var currentMonthIndex = 0
+    var selectIndexpath = IndexPath(row: 0, section: 0)
     
     /// 获取参数日期所在月份的天数
     /// - Parameter date: 给定日期，默认为当前时间
@@ -49,8 +51,8 @@ struct CalendarManager {
     /// 获取给定日期是星期几
     /// - Parameter date: 给定日期，默认为当前时间
     /// - Returns: 返回数组1-7
-    mutating func weekly(OrdinalityFromDate date: Date = Date()) -> Int? {
-        guard let num = currentCalendar.ordinality(of: .day, in: .weekOfMonth, for: date) else {
+    mutating func weekly(date OrdinalityFromDate: Date = Date()) -> Int? {
+        guard let num = currentCalendar.ordinality(of: .day, in: .weekOfMonth, for: OrdinalityFromDate) else {
             return nil
         }
         return num
@@ -58,7 +60,7 @@ struct CalendarManager {
     
     /// 获取给定日期是星期几
     /// - Parameter date: 给定日期，默认为当前时间
-    /// - Returns: 返回数组1-7
+    /// - Returns: 返回数组1-7， 需要手动减 1
     mutating func getWeekday(date: Date = Date()) -> Int? {
         let components = components(date: date)
         return components.weekday
@@ -141,7 +143,7 @@ struct CalendarManager {
         for index in 0..<months {
             if let indexDate = getMonth(date: startDate, byAdding: index) {
                 // 获取当前月，第一次滚动使用
-                if isCurrentMonth(date: indexDate) {
+                if isCurrentMonth(date: indexDate), currentMonthIndex == 0 {
                     currentMonthIndex = index
                 }
                 let modelArr = getMonthDays(date: indexDate)
@@ -173,7 +175,6 @@ struct CalendarManager {
         for index in 1...dayCounts {
             var model = CalendarModel(year: year, month: month, day: index)
             model.monthType = .showMonth
-//            model.isCurrentDay = isCurrentDate(date: date)
             modelArr.append(model)
         }
         
@@ -190,7 +191,7 @@ struct CalendarManager {
     /// - Returns: 返回补充日期数组
     mutating func getPreviousMonthDays(date: Date) -> [CalendarModel] {
         guard let firstDate = firstDay(ofMonthFromDate: date),
-              let weekly = getWeekday(date: firstDate), weekly - 1 != 0,
+              let weekly = weekly(date: firstDate), weekly - 1 != 0,
               let previousDate = getMonth(date: date, byAdding: -1),
               let previousDayCounts = days(ofMonthFromDate: previousDate) else {
             return []
@@ -217,7 +218,7 @@ struct CalendarManager {
     /// - Returns: 返回补充日期数组
     mutating func getNextMonthDays(date: Date) -> [CalendarModel] {
         guard let lastDate = lastDay(ofMonthFromDate: date),
-              let weekly = getWeekday(date: lastDate), weekly != 7,
+              let weekly = weekly(date: lastDate), weekly != 7,
               let followDate = getMonth(date: date, byAdding: 1) else {
             return []
         }
@@ -277,7 +278,7 @@ struct CalendarManager {
         // 获取日期
         if let date = self.date(form: dateStr) {
             model.date = date                           // 日期
-            model.weekday = getWeekday(date: date) ?? 0 // 星期几
+            model.weekday = weekly(date: date) ?? 0 // 星期几
             
             model.isToday = isToday(date: date)
             

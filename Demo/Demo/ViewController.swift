@@ -11,6 +11,8 @@ class ViewController: UIViewController {
 
     var calendar: CalendarView?
     
+//    var titleView: WeekTitleView = WeekTitleView(frame: .zero)
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
@@ -29,19 +31,14 @@ class ViewController: UIViewController {
         configure.calendarType = .solarAndLunar
         configure.startDate = startDate!
         configure.endDate = endDate!
-//        configure.onlyShowShowMonth = true
-        
+
         calendar = CalendarView(configure: configure)
         view.addSubview(calendar!)
         calendar?.snp.makeConstraints({ make in
-            make.top.equalTo(50)
+            make.top.equalTo(80)
             make.left.right.equalToSuperview()
-            make.height.equalTo(300)
+            make.height.equalTo(configure.calendarHeight)
         })
-    }
-
-    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-        calendar?.previousMonth()
     }
 }
 

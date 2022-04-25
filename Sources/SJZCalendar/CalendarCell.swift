@@ -87,22 +87,19 @@ class CalendarCell: UICollectionViewCell {
             solarLabel.textColor = configure.showMonthColor
             solarLabel.font = configure.showMonthFont
             
-            lunarLabel.textColor = configure.showMonthLunarColor
+            lunarLabel.textColor = configure.showMonthColor
             lunarLabel.font = configure.showMonthLunarFont
         }else {
             solarLabel.textColor = configure.notShowMonthColor
             solarLabel.font = configure.notShowMonthFont
             
-            lunarLabel.textColor = configure.notShowMonthLunarColor
+            lunarLabel.textColor = configure.notShowMonthColor
             lunarLabel.font = configure.notShowMonthLunarFont
         }
         
-        if model.isToday {
+        if model.isToday && model.monthType == .showMonth {
             solarLabel.textColor = configure.TodayColor
-            solarLabel.font = configure.TodayFont
-            
-            lunarLabel.textColor = configure.TodayLunarColor
-            lunarLabel.font = configure.TodayLunarFont
+            lunarLabel.textColor = configure.TodayColor
         }
         
         if configure.calendarType == .onlySolar {

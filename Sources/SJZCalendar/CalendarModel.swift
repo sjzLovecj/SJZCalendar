@@ -13,7 +13,7 @@ enum CalendarDateType: Int {
     case nextMonth      // 下个月
 }
 
-struct CalendarModel {
+class CalendarModel {
     var year: Int
     var month: Int
     var day: Int
